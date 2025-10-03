@@ -38,6 +38,19 @@ app.post('/api/consulta-oracolo', async (req, res) => {
             });
         }
 
+        // Easter egg per verifica proprietà
+        if (domanda.trim() === ':)pf') {
+            return res.json({
+                candidates: [{
+                    content: {
+                        parts: [{
+                            text: 'Ciao Pollino Fritto :)'
+                        }]
+                    }
+                }]
+            });
+        }
+
         // Usa la chiave API dal server (variabile d'ambiente)
         const apiKey = process.env.GEMINI_API_KEY;
 
