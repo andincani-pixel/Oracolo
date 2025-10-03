@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Oracolo della Fiamma 🔥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a0a0a 50%, #2a0f0f 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            max-height: 95vh;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        h1 {
+            font-size: clamp(1.5em, 6vw, 3em);
+            margin-bottom: 5px;
+            text-shadow: 0 0 20px rgba(255, 100, 0, 0.8), 0 0 40px rgba(255, 50, 0, 0.5);
+            animation: flicker 3s infinite;
+            line-height: 1.2;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; text-shadow: 0 0 20px rgba(255, 100, 0, 0.8); }
+            50% { opacity: 0.95; text-shadow: 0 0 30px rgba(255, 100, 0, 1); }
+        }
+
+        .subtitle {
+            font-size: clamp(0.75em, 2.5vw, 1.1em);
+            color: #ffb366;
+            margin-bottom: 15px;
+            font-style: italic;
+            opacity: 0.9;
+            line-height: 1.3;
+        }
+
+        /* Fiamma centrale */
+        .flame-container {
+            position: relative;
+            width: clamp(100px, 30vw, 200px);
+            height: clamp(120px, 25vh, 250px);
+            margin: 0 auto 15px;
+            flex-shrink: 0;
+        }
+
+        .flame {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: clamp(60px, 15vw, 100px);
+            height: clamp(90px, 18vh, 150px);
+            background: linear-gradient(to top, #ff4500, #ff8c00, #ffa500);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            filter: blur(10px);
+            animation: flameMove 2s ease-in-out infinite;
+            opacity: 0.8;
+        }
+
+        .flame::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: clamp(36px, 9vw, 60px);
+            height: clamp(60px, 12vh, 100px);
+            background: linear-gradient(to top, #ffa500, #ffff00);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            filter: blur(5px);
+            animation: innerFlame 1.5s ease-in-out infinite;
+        }
+
+        @keyframes flameMove {
+            0%, 100% { transform: translateX(-50%) scaleY(1); }
+            50% { transform: translateX(-50%) scaleY(1.1) scaleX(0.95); }
+        }
+
+        @keyframes innerFlame {
+            0%, 100% { transform: translateX(-50%) scaleY(1); }
+            50% { transform: translateX(-50%) scaleY(1.15); }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffa500;
+            border-radius: 50%;
+            animation: rise 3s ease-in infinite;
+            opacity: 0;
+        }
+
+        @keyframes rise {
+            0% {
+                bottom: 0;
+                opacity: 1;
+            }
+            100% {
+                bottom: 250px;
+                opacity: 0;
+                transform: translateX(var(--drift));
+            }
+        }
+
+        /* API Key input nascosto */
+        .api-section {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid rgba(255, 140, 0, 0.5);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .api-section.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .api-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .api-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .api-hint {
+            font-size: 1em;
+            color: #ffb366;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .api-hint a {
+            color: #ff8c00;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .api-hint a:hover {
+            text-decoration: underline;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: clamp(10px, 2vh, 15px) clamp(12px, 3vw, 20px);
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 140, 0, 0.5);
+            border-radius: 10px;
+            color: #ffb366;
+            font-size: clamp(0.9em, 2.5vw, 1em);
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #ff8c00;
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
+        }
+
+        textarea {
+            min-height: clamp(60px, 10vh, 100px);
+            max-height: 15vh;
+            resize: vertical;
+            margin-bottom: 15px;
+            font-family: 'Georgia', serif;
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 179, 102, 0.5);
+            font-style: italic;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff4500, #ff8c00);
+            color: white;
+            border: none;
+            padding: clamp(10px, 2vh, 18px) clamp(25px, 6vw, 50px);
+            border-radius: 50px;
+            font-size: clamp(0.9em, 2.8vw, 1.2em);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255, 69, 0, 0.4);
+            text-transform: uppercase;
+            letter-spacing: clamp(1px, 0.3vw, 2px);
+            margin-bottom: 15px;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 69, 0, 0.6);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .response-container {
+            margin-top: 10px;
+            height: clamp(100px, 18vh, 180px);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .response-box {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 140, 0, 0.5);
+            border-radius: 15px;
+            padding: clamp(15px, 3vh, 30px);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s;
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .response-text {
+            font-size: clamp(0.95em, 3vw, 1.3em);
+            line-height: 1.6;
+            color: #ffb366;
+            text-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(10px, 2vw, 15px);
+            font-size: clamp(1em, 2.5vw, 1.2em);
+            color: #ff8c00;
+        }
+
+        .loading-flame {
+            width: clamp(20px, 5vw, 30px);
+            height: clamp(26px, 6.5vw, 40px);
+            background: linear-gradient(to top, #ff4500, #ffa500);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            filter: blur(5px);
+            animation: loadingPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes loadingPulse {
+            0%, 100% { transform: scaleY(1); opacity: 0.8; }
+            50% { transform: scaleY(1.3); opacity: 1; }
+        }
+
+        .error {
+            color: #ff6b6b;
+            background: rgba(139, 0, 0, 0.3);
+            border-color: rgba(255, 0, 0, 0.5);
+        }
+
+        /* Toggle API Key */
+        .toggle-api {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 140, 0, 0.2);
+            border: 1px solid rgba(255, 140, 0, 0.5);
+            color: #ffb366;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .toggle-api:hover {
+            background: rgba(255, 140, 0, 0.3);
+            border-color: #ff8c00;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 5px; }
+            .subtitle { margin-bottom: 10px; }
+            .flame-container { margin-bottom: 10px; }
+            .toggle-api { 
+                top: 10px; 
+                right: 10px; 
+                padding: 6px 12px; 
+                font-size: clamp(0.75em, 2vw, 0.9em);
+            }
+        }
+
+        @media (max-height: 700px) {
+            .flame-container { height: 100px; margin-bottom: 8px; }
+            .subtitle { margin-bottom: 8px; font-size: 0.8em; }
+            textarea { min-height: 50px; }
+            .api-section { padding: 15px; margin-bottom: 10px; }
+            button { padding: 8px 20px; }
+        }
+
+        @media (max-width: 400px) {
+            h1 { font-size: 1.4em; }
+            .subtitle { font-size: 0.75em; }
+            button { font-size: 0.85em; letter-spacing: 0.5px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="api-overlay" id="apiOverlay" onclick="toggleApiSection()"></div>
+    
+    <div class="api-section" id="apiSection">
+        <div class="api-hint">
+            🔑 Inserisci la tua API Key da <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>
+        </div>
+        <input type="text" id="apiKey" placeholder="La tua chiave segreta...">
+    </div>
+
+    <button class="toggle-api" onclick="toggleApiSection()">⚙️ Impostazioni</button>
+
+    <div class="container">
+        <h1>🔥 L'Oracolo della Fiamma</h1>
+        <p class="subtitle">Ironica. Enigmatica. Illuminante.</p>
+
+        <div class="flame-container">
+            <div class="flame"></div>
+            <div class="particles" id="particles"></div>
+        </div>
+
+        <textarea 
+            id="domanda" 
+            placeholder="Interroga l'Oracolo... Poni la tua domanda sul destino, sulle scelte, sul futuro..."
+        ></textarea>
+
+        <button id="consultaBtn" onclick="consultaOracolo()">
+            Consulta l'Oracolo
+        </button>
+
+        <div class="response-container">
+            <div id="response" class="response-box">
+                <div class="response-text" style="opacity: 0.5;">La risposta apparirà qui...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Crea particelle animate
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.setProperty('--drift', `${(Math.random() - 0.5) * 100}px`);
+                particle.style.animationDelay = `${Math.random() * 3}s`;
+                container.appendChild(particle);
+            }
+        }
+
+        createParticles();
+
+        // Toggle API section
+        function toggleApiSection() {
+            const section = document.getElementById('apiSection');
+            const overlay = document.getElementById('apiOverlay');
+            section.classList.toggle('hidden');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Nascondi API section dopo il primo utilizzo
+        let apiKeyUsed = false;
+
+        // Mostra la sezione API all'avvio
+        window.addEventListener('DOMContentLoaded', () => {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                // Mostra il modal API all'apertura se non c'è chiave
+                document.getElementById('apiSection').classList.remove('hidden');
+                document.getElementById('apiOverlay').classList.remove('hidden');
+            }
+        });
+
+        async function consultaOracolo() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const domanda = document.getElementById('domanda').value.trim();
+            const responseDiv = document.getElementById('response');
+            const consultaBtn = document.getElementById('consultaBtn');
+
+            if (!apiKey) {
+                responseDiv.innerHTML = '<div class="response-text error">⚠️ L\'Oracolo richiede una chiave per manifestarsi...</div>';
+                document.getElementById('apiSection').classList.remove('hidden');
+                document.getElementById('apiOverlay').classList.remove('hidden');
+                return;
+            }
+
+            if (!domanda) {
+                responseDiv.innerHTML = '<div class="response-text error">🤔 L\'Oracolo attende la tua domanda...</div>';
+                return;
+            }
+
+            // Nascondi API section dopo primo uso
+            if (!apiKeyUsed) {
+                document.getElementById('apiSection').classList.add('hidden');
+                document.getElementById('apiOverlay').classList.add('hidden');
+                apiKeyUsed = true;
+            }
+
+            // Mostra loading
+            responseDiv.innerHTML = `
+                <div class="loading">
+                    <div class="loading-flame"></div>
+                    <span>Le fiamme danzano...</span>
+                </div>
+            `;
+            consultaBtn.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:3001/api/consulta-oracolo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        apiKey: apiKey,
+                        domanda: domanda
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Errore nella consultazione');
+                }
+
+                if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                    const resposta = data.candidates[0].content.parts[0].text;
+                    responseDiv.innerHTML = `<div class="response-text">${resposta}</div>`;
+                } else {
+                    throw new Error('Le fiamme non hanno rivelato nulla...');
+                }
+
+            } catch (error) {
+                responseDiv.innerHTML = `<div class="response-text error">❌ ${error.message}</div>`;
+            } finally {
+                consultaBtn.disabled = false;
+            }
+        }
+
+        // Shortcut: Ctrl+Enter per consultare
+        document.getElementById('domanda').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                consultaOracolo();
+            }
+        });
+    </script>
+</body>
+</html>
