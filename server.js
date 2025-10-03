@@ -1,9 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
 
 const app = express();
-const PORT = 3001; // Porta diversa per non conflittare con l'altro progetto
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -29,11 +30,20 @@ Rispondi SEMPRE in modo breve, intrigante e con un tocco di ironia saggia.`;
 
 app.post('/api/consulta-oracolo', async (req, res) => {
     try {
-        const { apiKey, domanda } = req.body;
+        const { domanda } = req.body;
 
-        if (!apiKey || !domanda) {
+        if (!domanda) {
             return res.status(400).json({ 
-                error: 'API key e domanda sono obbligatori' 
+                error: 'La domanda è obbligatoria' 
+            });
+        }
+
+        // Usa la chiave API dal server (variabile d'ambiente)
+        const apiKey = process.env.GEMINI_API_KEY;
+
+        if (!apiKey) {
+            return res.status(500).json({ 
+                error: 'Configurazione server incompleta' 
             });
         }
 
@@ -51,8 +61,8 @@ app.post('/api/consulta-oracolo', async (req, res) => {
                     }]
                 }],
                 generationConfig: {
-                    temperature: 0.9, // Più creativo
-                    maxOutputTokens: 150, // Risposte brevi
+                    temperature: 0.9,
+                    maxOutputTokens: 150,
                 }
             })
         });
