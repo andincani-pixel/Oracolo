@@ -58,7 +58,6 @@
             line-height: 1.3;
         }
 
-        /* Fiamma centrale */
         .flame-container {
             position: relative;
             width: clamp(100px, 30vw, 200px);
@@ -134,65 +133,7 @@
             }
         }
 
-        /* API Key input nascosto */
-        .api-section {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.95);
-            border: 2px solid rgba(255, 140, 0, 0.5);
-            border-radius: 15px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-
-        .api-section.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .api-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 999;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-
-        .api-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .api-hint {
-            font-size: 1em;
-            color: #ffb366;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .api-hint a {
-            color: #ff8c00;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .api-hint a:hover {
-            text-decoration: underline;
-        }
-
-        input[type="text"], textarea {
+        textarea {
             width: 100%;
             padding: clamp(10px, 2vh, 15px) clamp(12px, 3vw, 20px);
             background: rgba(0, 0, 0, 0.7);
@@ -202,20 +143,17 @@
             font-size: clamp(0.9em, 2.5vw, 1em);
             font-family: inherit;
             transition: all 0.3s;
-        }
-
-        input[type="text"]:focus, textarea:focus {
-            outline: none;
-            border-color: #ff8c00;
-            box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
-        }
-
-        textarea {
             min-height: clamp(60px, 10vh, 100px);
             max-height: 15vh;
             resize: vertical;
             margin-bottom: 15px;
             font-family: 'Georgia', serif;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #ff8c00;
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
         }
 
         textarea::placeholder {
@@ -317,45 +255,17 @@
             border-color: rgba(255, 0, 0, 0.5);
         }
 
-        /* Toggle API Key */
-        .toggle-api {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 140, 0, 0.2);
-            border: 1px solid rgba(255, 140, 0, 0.5);
-            color: #ffb366;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            font-size: 0.9em;
-            transition: all 0.3s;
-        }
-
-        .toggle-api:hover {
-            background: rgba(255, 140, 0, 0.3);
-            border-color: #ff8c00;
-        }
-
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 5px; }
             .subtitle { margin-bottom: 10px; }
             .flame-container { margin-bottom: 10px; }
-            .toggle-api { 
-                top: 10px; 
-                right: 10px; 
-                padding: 6px 12px; 
-                font-size: clamp(0.75em, 2vw, 0.9em);
-            }
         }
 
         @media (max-height: 700px) {
             .flame-container { height: 100px; margin-bottom: 8px; }
             .subtitle { margin-bottom: 8px; font-size: 0.8em; }
             textarea { min-height: 50px; }
-            .api-section { padding: 15px; margin-bottom: 10px; }
             button { padding: 8px 20px; }
         }
 
@@ -367,17 +277,6 @@
     </style>
 </head>
 <body>
-    <div class="api-overlay" id="apiOverlay" onclick="toggleApiSection()"></div>
-    
-    <div class="api-section" id="apiSection">
-        <div class="api-hint">
-            🔑 Inserisci la tua API Key da <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>
-        </div>
-        <input type="text" id="apiKey" placeholder="La tua chiave segreta...">
-    </div>
-
-    <button class="toggle-api" onclick="toggleApiSection()">⚙️ Impostazioni</button>
-
     <div class="container">
         <h1>🔥 L'Oracolo della Fiamma</h1>
         <p class="subtitle">Ironica. Enigmatica. Illuminante.</p>
@@ -404,7 +303,6 @@
     </div>
 
     <script>
-        // Crea particelle animate
         function createParticles() {
             const container = document.getElementById('particles');
             for (let i = 0; i < 20; i++) {
@@ -419,53 +317,16 @@
 
         createParticles();
 
-        // Toggle API section
-        function toggleApiSection() {
-            const section = document.getElementById('apiSection');
-            const overlay = document.getElementById('apiOverlay');
-            section.classList.toggle('hidden');
-            overlay.classList.toggle('hidden');
-        }
-
-        // Nascondi API section dopo il primo utilizzo
-        let apiKeyUsed = false;
-
-        // Mostra la sezione API all'avvio
-        window.addEventListener('DOMContentLoaded', () => {
-            const apiKey = document.getElementById('apiKey').value.trim();
-            if (!apiKey) {
-                // Mostra il modal API all'apertura se non c'è chiave
-                document.getElementById('apiSection').classList.remove('hidden');
-                document.getElementById('apiOverlay').classList.remove('hidden');
-            }
-        });
-
         async function consultaOracolo() {
-            const apiKey = document.getElementById('apiKey').value.trim();
             const domanda = document.getElementById('domanda').value.trim();
             const responseDiv = document.getElementById('response');
             const consultaBtn = document.getElementById('consultaBtn');
-
-            if (!apiKey) {
-                responseDiv.innerHTML = '<div class="response-text error">⚠️ L\'Oracolo richiede una chiave per manifestarsi...</div>';
-                document.getElementById('apiSection').classList.remove('hidden');
-                document.getElementById('apiOverlay').classList.remove('hidden');
-                return;
-            }
 
             if (!domanda) {
                 responseDiv.innerHTML = '<div class="response-text error">🤔 L\'Oracolo attende la tua domanda...</div>';
                 return;
             }
 
-            // Nascondi API section dopo primo uso
-            if (!apiKeyUsed) {
-                document.getElementById('apiSection').classList.add('hidden');
-                document.getElementById('apiOverlay').classList.add('hidden');
-                apiKeyUsed = true;
-            }
-
-            // Mostra loading
             responseDiv.innerHTML = `
                 <div class="loading">
                     <div class="loading-flame"></div>
@@ -475,13 +336,17 @@
             consultaBtn.disabled = true;
 
             try {
-                const response = await fetch('http://localhost:3001/api/consulta-oracolo', {
+                // Rileva se siamo in locale o in produzione
+                const apiUrl = window.location.hostname === 'localhost' 
+                    ? 'http://localhost:3001/api/consulta-oracolo'
+                    : '/api/consulta-oracolo';
+
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        apiKey: apiKey,
                         domanda: domanda
                     })
                 });
@@ -500,13 +365,12 @@
                 }
 
             } catch (error) {
-                responseDiv.innerHTML = `<div class="response-text error">❌ ${error.message}</div>`;
+                responseDiv.innerHTML = `<div class="response-text error">⚠️ ${error.message}</div>`;
             } finally {
                 consultaBtn.disabled = false;
             }
         }
 
-        // Shortcut: Ctrl+Enter per consultare
         document.getElementById('domanda').addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && e.ctrlKey) {
                 consultaOracolo();
